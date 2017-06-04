@@ -1,116 +1,100 @@
 <template>
   <v-app>
-    <v-navigation-drawer
-      persistent
-      :mini-variant="miniVariant"
-      :clipped="clipped"
-      v-model="drawer"
-    >
-      <v-list>
-        <v-list-item
-          v-for="(item, i) in items"
-          :key="i"
-        >
-          <v-list-tile value="true">
-            <v-list-tile-action>
-              <v-icon light v-html="item.icon"></v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title v-text="item.title"></v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-    <v-toolbar>
-      <v-toolbar-side-icon @click.native.stop="drawer = !drawer" light></v-toolbar-side-icon>
-      <v-btn 
-        icon
-        light
-        @click.native.stop="miniVariant = !miniVariant"
-      >
-        <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
+
+    <nav-drawer-main :drawerState="drawer" :items="drawerItems"></nav-drawer-main>
+    <v-toolbar primary>
+      <v-toolbar-side-icon @click.native.stop="drawer.show = !drawer.show"></v-toolbar-side-icon>
+      <v-btn icon @click.native.stop="drawer.mini = !drawer.mini">
+        <v-icon v-html="drawer.mini ? 'chevron_right' : 'chevron_left'"></v-icon>
       </v-btn>
-      <v-btn
-        icon
-        light
-        @click.native.stop="clipped = !clipped"
-      >
+      <v-btn icon @click.native.stop="drawer.clipped = !drawer.clipped">
         <v-icon>web</v-icon>
       </v-btn>
-      <v-btn
-        icon
-        light
-        @click.native.stop="fixed = !fixed"
-      >
+      <v-btn icon @click.native.stop="footer.fixed = !footer.fixed">
         <v-icon>remove</v-icon>
       </v-btn>
       <v-toolbar-title v-text="title"></v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn
-        icon
-        light
-        @click.native.stop="rightDrawer = !rightDrawer"
-      >
+      <v-toolbar-items>
+        <v-toolbar-item>Home</v-toolbar-item>
+        <v-toolbar-item>Contact</v-toolbar-item>
+      </v-toolbar-items>
+      <v-btn icon @click.native.stop="drawerRight.show = !drawerRight.show">
         <v-icon>menu</v-icon>
       </v-btn>
     </v-toolbar>
+
     <main>
       <v-container fluid>
         <v-slide-y-transition mode="out-in">
-          <v-layout column align-center>
-            <img src="/static/v.png" alt="Vuetify.js" class="mb-5" />
-            <blockquote>
-              &#8220;First, solve the problem. Then, write the code.&#8221;
-              <footer>
-                <small>
-                  <em>&mdash;John Johnson</em>
-                </small>
-              </footer>
-            </blockquote>
-          </v-layout>
+          <router-view></router-view>
         </v-slide-y-transition>
       </v-container>
     </main>
-    <v-navigation-drawer
-      temporary
-      :right="right"
-      v-model="rightDrawer"
-    >
-      <v-list>
-        <v-list-item>
-          <v-list-tile @click.native="right = !right">
-            <v-list-tile-action>
-              <v-icon light>compare_arrows</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-title>Switch drawer (click me)</v-list-tile-title>
-          </v-list-tile>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-    <v-footer :fixed="fixed">
+
+    <nav-drawer-right
+      :drawer-config="drawerRight"
+      :nav-drawer-state="drawer"
+      :toolbar-state="toolbar"
+      :footer-state="footer"
+    ></nav-drawer-right>
+
+
+    <v-footer :fixed="footer.fixed">
       <span>&copy; 2017</span>
     </v-footer>
   </v-app>
 </template>
 
 <script>
-  export default {
-    data () {
-      return {
+import NavDrawerMain from './components/NavDrawerMain.vue'
+import NavDrawerRight from './components/NavDrawerRight.vue'
+
+export default {
+  components: {NavDrawerMain, NavDrawerRight},
+  data () {
+    return {
+      title: 'Samples',
+      theme: { dark: false },
+      drawer: {
+        show: true,
         clipped: false,
-        drawer: true,
-        fixed: false,
-        items: [
-          { icon: 'bubble_chart', title: 'Inspire' }
-        ],
-        miniVariant: false,
-        right: true,
-        rightDrawer: false,
-        title: 'Vuetify.js'
-      }
+        mini: false,
+        dark: false, //this is the color as in the text color
+        persistent: true,
+        dense: false
+      },
+      toolbar: { fixed: false },
+      footer: {fixed: false},
+      drawerRight: { show: false, right: true },
+      drawerItems: [
+        {
+          title: 'Home',
+          action: 'home', //the icon for the action
+          group: 'home', //this group has to match the start of the href somehow
+          href: '/'
+        },
+        { divider: true, inset: false },
+        { header: 'Component acid tests'},
+        {
+          title: 'Examples',
+          action: 'info',
+          href: '/pages/examples'
+        },
+        {
+          title: 'About',
+          action: 'info',
+          group: 'about',
+          items: [
+            { href: '/about', title: 'Summary', action: 'computer' },
+            { href: '/about/history', title: 'History', action: 'router' }
+          ]
+        }
+
+      ]
     }
   }
+}
 </script>
 
 <style lang="stylus">
